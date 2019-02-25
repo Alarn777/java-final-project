@@ -6,17 +6,25 @@ import java.net.URL;
 import java.util.Vector;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
-public class DomParserDemo {
+public class CurrencyServiceRepository {
+    static Logger log = LogManager.getLogger(CurrencyServiceRepository.class.getName());
+
     private static HttpURLConnection con;
     private static InputStream is;
     private Vector returnArr;
     public Vector getCurrData() {
 
+        log.info("Test!!");
+        log.error("Test!!");
+        log.warn("Test!!");
         try {
             URL url = new URL("https://www.boi.org.il/currency.xml");
             con = (HttpURLConnection)url.openConnection();

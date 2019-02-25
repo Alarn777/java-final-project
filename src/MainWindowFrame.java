@@ -137,7 +137,7 @@ public class MainWindowFrame extends javax.swing.JFrame{
     }
 
     private void UpdateCurrencyValue(String[][] temp) {
-        DomParserDemo parserDemo = new DomParserDemo();
+        CurrencyServiceRepository parserDemo = new CurrencyServiceRepository();
         Vector bla = parserDemo.getCurrData();
         for (int i = 0; i< bla.size(); i++) {
             Vector n = (Vector) bla.elementAt(i);
