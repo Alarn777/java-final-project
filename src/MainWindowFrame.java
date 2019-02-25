@@ -150,11 +150,6 @@ public class MainWindowFrame extends javax.swing.JFrame{
 
     public static void main(String args[]){
 
-        EventQueue.invokeLater(new Runnable(){
-            @Override
-            public void run(){
-                new MainWindowFrame().setVisible(true);
-            }
-        });
+        EventQueue.invokeLater(() -> new MainWindowFrame().setVisible(true));
     }
 }
