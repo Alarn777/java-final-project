@@ -20,7 +20,7 @@ import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
 import java.util.Vector;
 
-public class CurrencyServiceRepository {
+public class CurrencyServiceRepository implements ICurrencyServiceRepository {
     static Logger log = LogManager.getLogger(CurrencyServiceRepository.class.getName());
 
     private final String lastDownloadedRatesFilePath = "lastCurrencyCheck.xml";
@@ -34,13 +34,41 @@ public class CurrencyServiceRepository {
 
     private void getLastSyncDate() {
         try {
-            lastSyncDate = Files.getLastModifiedTime(Paths.get(lastDownloadedRatesFilePath));
+            if (new File(lastDownloadedRatesFilePath).exists())
+                lastSyncDate = Files.getLastModifiedTime(Paths.get(lastDownloadedRatesFilePath));
+            else
+                lastSyncDate = FileTime.fromMillis(0);
+
         } catch (IOException e) {
             log.error("Can't read currencies file");
         }
     }
+@Override
+    public void DownloadLatestRates() throws IOException {
+        try {
+            CurrencyServiceRepository.log.info("Starting rates download.");
 
+            URL url = new URL(serviceUrl);
+            var connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
 
+            var inputStream = connection.getInputStream();
+            byte[] buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+
+            var targetFile = new File(lastDownloadedRatesFilePath);
+            new FileOutputStream(targetFile).write(buffer);
+
+            getLastSyncDate();
+            CurrencyServiceRepository.log.info("Downloading rates from " + serviceUrl + " completed.");
+
+        } catch (Exception e) {
+            CurrencyServiceRepository.log.error("Failed to download latest currency rates.");
+        }
+    }
+
+    @Override
     public Vector getCurrData() {
         try {
             var lastUpdateTimestamp = lastSyncDate.toMillis();
@@ -120,30 +148,6 @@ public class CurrencyServiceRepository {
             }
         }
         return rates;
-    }
-
-    private void DownloadLatestRates() throws IOException {
-        try {
-            log.info("Starting rates download.");
-
-            URL url = new URL(serviceUrl);
-            var connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-
-            var inputStream = connection.getInputStream();
-            byte[] buffer = new byte[inputStream.available()];
-            inputStream.read(buffer);
-
-            var targetFile = new File(lastDownloadedRatesFilePath);
-            new FileOutputStream(targetFile).write(buffer);
-
-            getLastSyncDate();
-            log.info("Downloading rates from " + serviceUrl + " completed.");
-
-        } catch (Exception e) {
-            log.error("Failed to download latest currency rates.");
-        }
     }
 
 }
