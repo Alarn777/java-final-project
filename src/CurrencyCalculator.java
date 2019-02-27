@@ -1,9 +1,14 @@
+/**
+ * This is Simple Currency converter Class
+ */
+
 import java.util.HashMap;
 
 public class CurrencyCalculator {
 
     private final HashMap<String, Float> conversionsMap;
     private final String primary = "NIS";
+
 
     public CurrencyCalculator(String[][] conversionsTable) {
         conversionsMap = new HashMap<>();
@@ -15,6 +20,16 @@ public class CurrencyCalculator {
         }
     }
 
+    /**
+     * This method converts some amount form source currency to target currency
+     * example:
+     *      convert("NIS","USD,100);
+     *      // result --> 370  if rate is 3.7
+     * @param source
+     * @param target
+     * @param amount
+     * @return converted amount
+     */
     public float convert(String source, String target, float amount) {
 
         if (target.equals(source))
@@ -26,10 +41,6 @@ public class CurrencyCalculator {
         if (target.equals(primary))
             return amount * conversionsMap.get(source);
 
-        //$-->#
-        //10$ * ShR = 340Sh
-        //340Sh / #R = 7#
-        //10$=7#
         float amountInPrim = amount * conversionsMap.get(source);
 
         return amountInPrim / conversionsMap.get(target);

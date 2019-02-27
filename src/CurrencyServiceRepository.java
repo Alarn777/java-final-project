@@ -1,9 +1,11 @@
+/**
+ * This is Simple repository service for getting and managing Currencies Feed From bank of Israel
+ */
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -135,5 +137,4 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
                 .item(0)
                 .getTextContent();
     }
-
 }
