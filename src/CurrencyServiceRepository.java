@@ -8,6 +8,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
@@ -48,10 +49,11 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
 
     /**
      * This Method Downloads current Currencies feed from the website of bank of Israel (https://www.boi.org.il/currency.xml)
+     *
      * @throws IOException
      */
     @Override
-    public void DownloadLatestRates() throws IOException {
+    public void downloadLatestRates() throws IOException {
         try {
             CurrencyServiceRepository.log.info("Starting rates download.");
 
@@ -75,8 +77,10 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
         }
     }
 
+
     /**
      * This method attempt to download latest rates feed and if fails uses previously saved locally rates and returns its values.
+     *
      * @return Collection of available currencies rates
      */
     @Override
@@ -84,7 +88,7 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
         try {
             var lastUpdateTimestamp = lastSyncDate.toMillis();
 
-            DownloadLatestRates();
+            downloadLatestRates();
 
             if (lastUpdateTimestamp == lastSyncDate.toMillis())
                 log.info("Using previously downloaded rates from "
@@ -137,4 +141,14 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
                 .item(0)
                 .getTextContent();
     }
+
+//    class CurrenciesFeedUpdater extends Thread {
+//        private Timer timer;
+//
+//        Logger log = LogManager.getLogger(CurrenciesFeedUpdater.class.getName());
+//
+//        public void run() {
+//
+//        }
+//    }
 }

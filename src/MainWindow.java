@@ -1,9 +1,8 @@
 /**
  * This is a simple Currency Converter application made with swing GUI.
- * @Authors:
- *          Michael Rokitko (334065893)
- *          Evgeny Alterman (317747814)
  *
+ * @Authors: Michael Rokitko (334065893)
+ * Evgeny Alterman (317747814)
  * @version 1.0
  * @created 28-02-2019
  */
@@ -13,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.Vector;
 
 import static javax.swing.JOptionPane.*;
@@ -40,8 +40,8 @@ public class MainWindow extends javax.swing.JFrame {
     private JComboBox targetCurrencyCombo;
     private JTextField sourceAmountTextField;
     private String[] currenciesTypes;
-    private ICurrencyServiceRepository currencyServiceRepository = new CurrencyServiceRepository();
-
+    private static ICurrencyServiceRepository currencyServiceRepository = new CurrencyServiceRepository();
+    private Timer timer;
 
     public MainWindow() {
         loadCurrenciesValues();
@@ -52,8 +52,22 @@ public class MainWindow extends javax.swing.JFrame {
         populateCurrenciesTablePanel();
         populateConversionsPanel();
         populateMainControlsPanel();
+        watchForChanges();
 
         pack();   // calling pack() at the end, will ensure that every layout and size we just defined gets applied before the stuff becomes visible
+    }
+
+    private void watchForChanges() {
+        // Update Rates from service each 10 minutes
+        timer = new Timer(1000 * 60 * 10, e -> {
+            try {
+                currencyServiceRepository.downloadLatestRates();
+                loadCurrenciesValues();
+            } catch (IOException ex) {
+                log.error("Failed To Update Feed");
+            }
+        });
+        timer.start();
     }
 
     private void populateMainControlsPanel() {
@@ -88,8 +102,8 @@ public class MainWindow extends javax.swing.JFrame {
                     (String) targetCurrencyCombo.getSelectedItem(),
                     amount);
             log.info("Converted " +
-                    amount +  (String) sourceCurrencyCombo.getSelectedItem() +
-                    " to " +result+  (String) targetCurrencyCombo.getSelectedItem());
+                    amount + (String) sourceCurrencyCombo.getSelectedItem() +
+                    " to " + result + (String) targetCurrencyCombo.getSelectedItem());
 
             targetAmountTextField.setText(String.valueOf(result));
         });
@@ -135,7 +149,7 @@ public class MainWindow extends javax.swing.JFrame {
         currenciesTypes = new String[currenciesTableValues.length + 1];
 
         for (int i = 0; i < currenciesTableValues.length; i++)
-            currenciesTypes[i+1] = currenciesTableValues[i][1];
+            currenciesTypes[i + 1] = currenciesTableValues[i][1];
 
         currenciesTypes[0] = "NIS";
     }
@@ -156,10 +170,10 @@ public class MainWindow extends javax.swing.JFrame {
 
         var currenciesTableScrollPane = new JScrollPane(currenciesTable);
 
-        var updateCurrenciesButton  =new JButton("Update Currencies");
-        updateCurrenciesButton.addActionListener(e-> loadCurrenciesValues());
+        var updateCurrenciesButton = new JButton("Update Currencies");
+        updateCurrenciesButton.addActionListener(e -> loadCurrenciesValues());
 
-        currenciesTablePanel.setLayout(new BoxLayout(currenciesTablePanel,BoxLayout.Y_AXIS));
+        currenciesTablePanel.setLayout(new BoxLayout(currenciesTablePanel, BoxLayout.Y_AXIS));
         currenciesTablePanel.add(currenciesTableScrollPane);
         currenciesTablePanel.add(updateCurrenciesButton);
     }

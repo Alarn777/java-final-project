@@ -7,5 +7,6 @@ import java.util.Vector;
 
 public interface ICurrencyServiceRepository {
     Vector getCurrData();
-    void DownloadLatestRates() throws IOException;
+    void downloadLatestRates() throws IOException;
+
 }
