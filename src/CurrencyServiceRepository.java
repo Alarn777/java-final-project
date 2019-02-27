@@ -43,7 +43,12 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
             log.error("Can't read currencies file");
         }
     }
-@Override
+
+    /**
+     * This Method Downloads current Currencies feed from the website of bank of Israel (https://www.boi.org.il/currency.xml)
+     * @throws IOException
+     */
+    @Override
     public void DownloadLatestRates() throws IOException {
         try {
             CurrencyServiceRepository.log.info("Starting rates download.");
@@ -68,6 +73,10 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
         }
     }
 
+    /**
+     * This method attempt to download latest rates feed and if fails uses previously saved locally rates and returns its values.
+     * @return Collection of available currencies rates
+     */
     @Override
     public Vector getCurrData() {
         try {
@@ -92,62 +101,39 @@ public class CurrencyServiceRepository implements ICurrencyServiceRepository {
     private Vector parseRatesXmlFile() throws ParserConfigurationException, SAXException, IOException {
         var savedFileStream = new FileInputStream(new File(lastDownloadedRatesFilePath));
 
-        var factory = DocumentBuilderFactory.newInstance();
-        var builder = factory.newDocumentBuilder();
-        var doc = builder.parse(savedFileStream);
-        doc.getDocumentElement().normalize();
-        NodeList nList = doc.getElementsByTagName("CURRENCY");
+        var documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        var documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        var document = documentBuilder.parse(savedFileStream);
 
+        document.getDocumentElement().normalize();
+
+        var currencyTree = document.getElementsByTagName("CURRENCY");
         var rates = new Vector();
-        for (int i = 0; i < nList.getLength(); i++) {
 
-            Node nNode = nList.item(i);
-            Vector oneLine = new Vector();
+        for (int i = 0; i < currencyTree.getLength(); i++) {
+            var currencyNode = currencyTree.item(i);
+            var currencyInfo = new Vector();
 
-            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element elm = (Element) nNode;
-                String value = elm
-                        .getElementsByTagName("NAME")
-                        .item(0)
-                        .getTextContent();
+            if (currencyNode.getNodeType() == Node.ELEMENT_NODE) {
 
+                currencyInfo.add(getNodeValue((Element) currencyNode, "NAME"));
+                currencyInfo.add(getNodeValue((Element) currencyNode, "CURRENCYCODE"));
+                currencyInfo.add(getNodeValue((Element) currencyNode, "COUNTRY"));
+                currencyInfo.add(getNodeValue((Element) currencyNode, "RATE"));
+                currencyInfo.add(getNodeValue((Element) currencyNode, "UNIT"));
 
-                oneLine.add(value);
-
-                value = elm
-                        .getElementsByTagName("CURRENCYCODE")
-                        .item(0)
-                        .getTextContent();
-
-
-                oneLine.add(value);
-
-                value = elm
-                        .getElementsByTagName("COUNTRY")
-                        .item(0)
-                        .getTextContent();
-
-
-                oneLine.add(value);
-
-                value = elm
-                        .getElementsByTagName("RATE")
-                        .item(0)
-                        .getTextContent();
-
-                oneLine.add(value);
-
-                value = elm
-                        .getElementsByTagName("UNIT")
-                        .item(0)
-                        .getTextContent();
-
-                oneLine.add(value);
-
-                rates.add(oneLine);
+                rates.add(currencyInfo);
             }
         }
+
         return rates;
+    }
+
+    private String getNodeValue(Element element, String name) {
+        return element
+                .getElementsByTagName(name)
+                .item(0)
+                .getTextContent();
     }
 
 }

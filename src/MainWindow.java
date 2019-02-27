@@ -1,3 +1,13 @@
+/**
+ * This is a simple Currency Converter application made with swing GUI.
+ * @Authors:
+ *          Michael Rokitko (334065893)
+ *          Evgeny Alterman (317747814)
+ *
+ * @version 1.0
+ * @created 28-02-2019
+ */
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
